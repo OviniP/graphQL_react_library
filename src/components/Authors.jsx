@@ -6,6 +6,7 @@ const Authors = (props) => {
 
   const [name, setName] = useState("")
   const [year, setYear] = useState("")
+  const token = localStorage.getItem('library-user-token')
 
   const result = useQuery(ALL_AUTHORS)
   
@@ -54,7 +55,7 @@ const Authors = (props) => {
           </tbody>
         </table>
       </div>
-      <div>
+      {token && <div>
         <h2>Set birth year</h2>
         <form onSubmit={setBirthYear}>
             <div>
@@ -71,7 +72,7 @@ const Authors = (props) => {
             </div>
             <button>Update Author</button>
         </form>
-      </div>
+      </div>}
     </div>
   )
 }
