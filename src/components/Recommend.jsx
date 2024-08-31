@@ -1,20 +1,30 @@
-import { useQuery } from "@apollo/client"
-import { ALL_BOOKS, LOGGEDIN_USER } from "../queries"
+import { useQuery } from '@apollo/client'
+import { ALL_BOOKS, LOGGED_IN_USER } from "../queries"
+import {useEffect} from "react"
 
 const Recommend = (props) => {
 
-    const token = localStorage.getItem('library-user-token')
-    const userResult = useQuery(LOGGEDIN_USER)
-    const result = useQuery(ALL_BOOKS)
+    const userResult = useQuery(LOGGED_IN_USER)
+    const { data, loading, refetch } = useQuery(ALL_BOOKS, {
+        variables: { genre: userResult.data?.me?.favoriteGenre },
+        skip: !userResult?.data?.me?.favoriteGenre, // Skip if favoriteGenre is not available
+    });
+    
+    useEffect(() => {
+        if (userResult.data?.me?.favoriteGenre) {
+            refetch({ genre: userResult.data.me.favoriteGenre });
+        }
+      }, [userResult.data?.me, refetch]);
     
     if(!props.show)
         return null
-    if(result.loading || userResult.loading)
+    if(loading || userResult.loading)
         {
           return <div>Loading</div>
         }
-    const books = result.data.allBooks
+    const books = data?.allBooks
     const user = userResult.data?.me
+    console.log(user)
 
     return (
         <>
@@ -27,7 +37,7 @@ const Recommend = (props) => {
                     <th>author</th>
                     <th>published</th>
                 </tr>
-                {books.map((a) => (
+                {books?.map((a) => (
                     <tr key={a.title}>
                     <td>{a.title}</td>
                     <td>{a.author.name}</td>
